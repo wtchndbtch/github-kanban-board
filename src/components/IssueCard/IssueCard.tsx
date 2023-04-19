@@ -1,6 +1,6 @@
 import { Card, Typography } from "antd";
 
-import { Issue } from "@/interfaces";
+import { Issue } from "@/api";
 import { getIssueDays } from "@/utils";
 
 type Props = {
@@ -8,9 +8,9 @@ type Props = {
 };
 
 export const IssueCard = (props: Props) => {
-  const { title, number, date } = props.issue;
+  const { title, number, created_at } = props.issue;
 
-  const issueDaysOld = getIssueDays(date);
+  const issueDaysOld = getIssueDays(created_at);
 
   return (
     <Card size="small">

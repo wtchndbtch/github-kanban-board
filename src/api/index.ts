@@ -1,2 +1,2 @@
-export { getUrl } from "./getIssues";
+export { getIssuesAPI } from "./getIssuesAPI";
 export * from "./types";

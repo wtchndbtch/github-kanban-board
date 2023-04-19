@@ -3,8 +3,10 @@ import { Button, Input, Space } from "antd";
 import { useState } from "react";
 import styled from "styled-components";
 
-import { getUrl } from "@/api";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { getIssuesData } from "@/store/issueLists-slice";
 import { isValidRepoUrl } from "@/utils";
+import { getIssuesPayload } from "@/utils";
 
 const INPUT_PLACEHOLDER = "https://github.com/facebook/react";
 
@@ -21,6 +23,8 @@ const SearchButton = styled(Button)({
 });
 
 export const SearchBar = () => {
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector(state => state.issues);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(false);
 
@@ -28,13 +32,16 @@ export const SearchBar = () => {
     const url = event.target.value;
 
     setInputValue(url);
-    setError(isValidRepoUrl(url));
+    setError(!isValidRepoUrl(url));
   };
 
   const handleClick = () => {
     // setError => true | show notificaiton "Please enter repository url"
     if (!inputValue) return;
 
+    const payload = getIssuesPayload(inputValue);
+
+    dispatch(getIssuesData(payload));
     // TODO: dispatch action to make api request
 
     // const validValue = getValidUrl(inputValue);
@@ -51,6 +58,7 @@ export const SearchBar = () => {
   return (
     <SearchBarContainer>
       <Input
+        disabled={isLoading}
         onChange={handleChange}
         status={error ? "error" : ""}
         placeholder={INPUT_PLACEHOLDER}
@@ -60,8 +68,7 @@ export const SearchBar = () => {
         type="primary"
         danger={error}
         disabled={error}
-        // TODO pass loading state from store
-        // loading
+        loading={isLoading}
         onClick={handleClick}
         icon={error && <FrownFilled />}
       >

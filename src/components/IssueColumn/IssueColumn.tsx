@@ -1,7 +1,7 @@
 import { Card, Typography } from "antd";
 import styled from "styled-components";
 
-import { Issue } from "@/interfaces";
+import { Issue } from "@/api";
 
 import { Box } from "../Box";
 import { IssueCard } from "../IssueCard";
