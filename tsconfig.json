@@ -20,8 +20,8 @@
       "@/*": ["src/*"],
       "@api/*": ["src/api/*"],
       "@components/*": ["src/components/*"],
-      "@interfaces/*": ["src/interfaces/*"],
       "@store/*": ["src/store/*"],
+      "@theme/*": ["src/theme/*"],
       "@utils/*": ["src/utils/*"]
     }
   },

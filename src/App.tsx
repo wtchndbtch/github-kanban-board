@@ -1,22 +1,24 @@
 import { Board } from "@components/Board";
 import { SearchBar } from "@components/SearchBar";
-import { Layout } from "antd";
 import styled from "styled-components";
 
-const Header = styled(Layout.Header)({
+import { Box } from "./components/Box";
+
+const MainContainer = styled(Box)({
   display: "flex",
-  justifyContent: "center",
   alignItems: "center",
+  flexDirection: "column",
+  width: "80%",
+  margin: "0 auto",
 });
 
 function App() {
   return (
-    <Layout>
-      <Header>
-        <SearchBar />
-      </Header>
+    <MainContainer>
+      <SearchBar />
+
       <Board />
-    </Layout>
+    </MainContainer>
   );
 }
 

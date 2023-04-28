@@ -2,6 +2,7 @@ import { Issue } from "../api/types";
 
 // select only used data from issue returned by api
 export const buildIssue = (issue: Issue): Issue => ({
+  id: issue.id,
   state: issue.state,
   number: issue.number,
   title: issue.title,
