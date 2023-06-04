@@ -1,5 +1,3 @@
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 import { Avatar, Card, Divider, Typography } from "antd";
 import { memo } from "react";
 import styled from "styled-components";
@@ -7,64 +5,48 @@ import styled from "styled-components";
 import { Issue } from "@/api";
 import { getIssueDays, GITHUB_URL } from "@/utils";
 
-import { Status } from "../Board/Board";
-import { Box } from "../Box";
+import { Box } from "../../UI/Box";
 
 const IssueContainer = styled(Card)({
   margin: "8px",
 });
 
-type Props = {
-  issue: Issue;
-  status: Status;
+type IssueCardProps = {
+  issue: Issue | null;
 };
 
-const IssueCard = (props: Props) => {
-  const { title, number, created_at, id, assignee, comments, user } =
-    props.issue;
+export const IssueCard = memo((props: IssueCardProps) => {
+  const { issue } = props;
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id,
-    data: {
-      status: props.status,
-    },
-  });
+  console.log("card");
 
-  const style = {
-    transform: CSS.Translate.toString(transform),
-  };
+  const issueDaysOld = issue ? getIssueDays(issue.created_at) : "";
 
-  const issueDaysOld = getIssueDays(created_at);
+  return issue ? (
+    <IssueContainer size="small">
+      <Typography.Title level={5}>{issue.title}</Typography.Title>
 
-  return (
-    <IssueContainer
-      size="small"
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-    >
-      <Typography.Title level={5}>{title}</Typography.Title>
+      <Typography.Paragraph>
+        {`#${issue.number} opened ${issueDaysOld}`}
+      </Typography.Paragraph>
 
-      <Typography.Paragraph>{`#${number} opened ${issueDaysOld}`}</Typography.Paragraph>
-
-      {assignee && (
+      {issue.assignee && (
         <Box display="flex" justifyContent="flex-end">
-          <Avatar src={assignee.avatar_url} alt="Avatar" />
+          <Avatar src={issue.assignee.avatar_url} alt="Avatar" />
         </Box>
       )}
 
       <Box display="flex" justifyContent="space-between">
-        <Typography.Link href={`${GITHUB_URL}${user.login}`}>
-          {user.login}
+        <Typography.Link href={`${GITHUB_URL}${issue?.user.login}`}>
+          {issue.user.login}
         </Typography.Link>
 
         <Divider type="vertical" />
 
-        <Typography.Text>{`Comments: ${comments}`}</Typography.Text>
+        <Typography.Text>{`Comments: ${issue.comments}`}</Typography.Text>
       </Box>
     </IssueContainer>
+  ) : (
+    <Box style={{ height: "100%" }} />
   );
-};
-
-export default IssueCard;
+});

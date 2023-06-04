@@ -31,6 +31,11 @@ export interface IssueLists {
   [COLUMN_TYPES.DONE]: Issue[];
 }
 
+export type Status =
+  | COLUMN_TYPES.TO_DO
+  | COLUMN_TYPES.IN_PROGRESS
+  | COLUMN_TYPES.DONE;
+
 export interface RepoInfo {
   owner: string;
   repo: string;

@@ -1,5 +1,3 @@
-import { arrayBuffer } from "stream/consumers";
-
 export const REGEXES = {
   GITHUB_URL_START: /^(https:\/\/)?(github.com)\//,
   GITHUB_REPO:
@@ -13,7 +11,3 @@ export enum COLUMN_TYPES {
   IN_PROGRESS = "inProgress",
   DONE = "done",
 }
-
-export const COLORS = {
-  darkBlue: "#313899",
-};

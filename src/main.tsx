@@ -8,14 +8,7 @@ import { Provider } from "react-redux";
 
 import App from "./App";
 import { store } from "./store";
-
-const customTheme = {
-  token: {
-    colorPrimary: "#b37feb",
-    colorTextBase: "#030852",
-    colorWarning: "#da3760",
-  },
-};
+import { customTheme } from "./theme";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

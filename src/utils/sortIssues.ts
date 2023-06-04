@@ -1,4 +1,4 @@
-import { IssueLists } from "@/interfaces";
+import { IssueLists } from "@/api";
 
 export const sortIssuesById = (object: IssueLists) => {
   const newObj = { ...object };
@@ -10,10 +10,10 @@ export const sortIssuesById = (object: IssueLists) => {
   };
 };
 
-export const getIssuesIdArrays = (obj: IssueLists) => {
-  return {
-    todo: obj.todo.map(issue => issue.id),
-    inProgress: obj.inProgress.map(issue => issue.id),
-    done: obj.done.map(issue => issue.id),
-  };
-};
+// export const getIssuesIdArrays = (obj: IssueLists) => {
+//   return {
+//     todo: obj.todo.map(issue => issue.id),
+//     inProgress: obj.inProgress.map(issue => issue.id),
+//     done: obj.done.map(issue => issue.id),
+//   };
+// };

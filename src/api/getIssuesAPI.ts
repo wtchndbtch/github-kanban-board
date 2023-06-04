@@ -2,7 +2,9 @@ import { GetIssuesPayload } from "./types";
 
 export const getIssuesAPI = async (payload: GetIssuesPayload) => {
   const { owner, repo } = payload;
+
   let response;
+
   try {
     response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/issues?state=all`,
@@ -15,6 +17,7 @@ export const getIssuesAPI = async (payload: GetIssuesPayload) => {
   } catch (error) {
     throw new Error("Something went wrong");
   }
+
   if (!response.ok) return;
 
   return response;

@@ -1,8 +1,11 @@
-import { Board } from "@components/Board";
-import { SearchBar } from "@components/SearchBar";
+import { Spin } from "antd";
 import styled from "styled-components";
 
-import { Box } from "./components/Box";
+import { Board } from "@/modules/Board";
+import { SearchBar } from "@/modules/SearchBar";
+
+import { useAppSelector } from "./store";
+import { Box } from "./UI/Box";
 
 const MainContainer = styled(Box)({
   display: "flex",
@@ -13,11 +16,13 @@ const MainContainer = styled(Box)({
 });
 
 function App() {
+  const { isLoading } = useAppSelector(state => state.issues);
+
   return (
     <MainContainer>
       <SearchBar />
 
-      <Board />
+      {isLoading ? <Spin size="large" /> : <Board />}
     </MainContainer>
   );
 }

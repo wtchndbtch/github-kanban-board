@@ -1,38 +1,52 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import {
-  getIssuesAPI,
-  GetIssuesPayload,
-  getRepoInfoAPI,
-  Issue,
-  RepoInfo,
-  RepoInfoResponse,
-} from "@/api";
+import { getIssuesAPI, GetIssuesPayload, Issue } from "@/api";
 import { IssueLists } from "@/api";
-import { Status } from "@/components/Board/Board";
+import { Status } from "@/api";
 import { buildIssue, getIssueState } from "@/utils";
+import { saveIssuesDataToStorage } from "@/utils/localStorage";
 import { sortIssuesById } from "@/utils/sortIssues";
 
 interface issueListsSlice {
-  issuesLists: IssueLists | null;
+  issuesLists: null | IssueLists;
+  // todo: Issue[] | null;
+  // inProgress: Issue[] | null;
+  // done: Issue[] | null;
   isLoading: boolean;
   isError: boolean;
-  repoInfo: RepoInfo | null;
+}
+
+interface UpdatePayload {
+  updatedList: Issue[];
+  status: Status;
+}
+
+interface MovePayload {
+  issue: Issue;
+  status: Status;
+  overIndex: number;
+}
+
+interface RemovePayload {
+  id: UniqueIdentifier;
+  status: Status;
 }
 
 const initialState: issueListsSlice = {
   issuesLists: null,
+  // todo: null,
+  // inProgress: null,
+  // done: null,
   isLoading: false,
   isError: false,
-  repoInfo: null,
 };
 
 export const getIssuesData = createAsyncThunk(
   "issues/getIssuesData",
+
   async (urlPayload: GetIssuesPayload) => {
     const response = await getIssuesAPI(urlPayload);
-
     const data: Issue[] = await response!.json();
 
     const issueData = data.reduce<IssueLists>(
@@ -47,34 +61,14 @@ export const getIssuesData = createAsyncThunk(
       { todo: [], inProgress: [], done: [] }
     );
 
-    return sortIssuesById(issueData);
-  }
-);
+    const sortedIssues = sortIssuesById(issueData);
 
-export const getRepoInfo = createAsyncThunk(
-  "issues/getRepoInfo",
-  async (urlPayload: GetIssuesPayload) => {
-    const response = await getRepoInfoAPI(urlPayload);
+    saveIssuesDataToStorage(
+      `${urlPayload.owner}${urlPayload.repo}`,
+      sortedIssues
+    );
 
-    if (!response?.ok) {
-      return;
-    }
-
-    const data: RepoInfoResponse = await response.json();
-    const starsData: number = data.stargazers_count;
-
-    let stars = starsData;
-    if (starsData > 1000) {
-      stars = +(starsData / 1000).toFixed(1);
-    }
-
-    const repoInfo: RepoInfo = {
-      owner: data.owner.login,
-      repo: data.name,
-      stars,
-    };
-
-    return repoInfo;
+    return sortedIssues;
   }
 );
 
@@ -82,66 +76,55 @@ const issueListsSlice = createSlice({
   name: "issues",
   initialState,
   reducers: {
-    updateIssueLists(
-      state,
-      action: {
-        payload: {
-          updatedList: Issue[];
-          status: Status;
-        };
-      }
-    ) {
+    getInitialIssueLists: (state, action: PayloadAction<IssueLists>) => {
+      // state.todo = action.payload.todo;
+      // state.inProgress = action.payload.inProgress;
+      // state.done = action.payload.done;
+      state.issuesLists = action.payload;
+    },
+
+    updateIssueLists: (state, action: PayloadAction<UpdatePayload>) => {
+      if (!state.issuesLists) return;
+
       const { updatedList, status } = action.payload;
 
-      if (!state.issuesLists) return;
-      state.issuesLists[status] = updatedList;
+      state.issuesLists = { ...state.issuesLists, [status]: updatedList };
+      // state[status] = updatedList;
     },
 
-    moveIssue(
-      state,
-      action: {
-        payload: {
-          issue: Issue;
-          status: Status;
-          overIndex: number;
-        };
-      }
-    ) {
-      const { issue, status, overIndex } = action.payload;
+    moveIssue: (state, action: PayloadAction<MovePayload>) => {
       if (!state.issuesLists) return;
+
+      const { issue, status, overIndex } = action.payload;
+
+      // const listToUpdate = state[status]
       const listToUpdate = state.issuesLists[status];
 
-      listToUpdate.length === 0
-        ? listToUpdate.push(issue)
-        : listToUpdate.splice(overIndex, 0, issue);
-
-      state.issuesLists = {
-        [status]: listToUpdate,
-        ...state.issuesLists,
-      };
+      listToUpdate.splice(overIndex, 0, issue);
+      // state[status] = listToUpdate;
+      state.issuesLists = { ...state.issuesLists, [status]: listToUpdate };
     },
-    removeIssue(
-      state,
-      action: {
-        payload: {
-          id: UniqueIdentifier;
-          status: Status;
-        };
-      }
-    ) {
-      const { id, status } = action.payload;
+    removeIssue: (state, action: PayloadAction<RemovePayload>) => {
       if (!state.issuesLists) return;
-      const updatedList: Issue[] = state.issuesLists[status].filter(
-        issue => issue.id !== id
-      );
+      const { id, status } = action.payload;
+
+      //const listToUpdate = state[status] as Issue[];
+      const listToUpdate = state.issuesLists![status];
+      const updatedList = listToUpdate.filter(issue => issue.id !== id);
+
+      // state[status] = updatedList;
       state.issuesLists = { ...state.issuesLists, [status]: updatedList };
     },
 
-    setIsError(state, action) {
-      if (state.isError === action.payload) return;
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+
+    setIsError: (state, action: PayloadAction<boolean>) => {
       state.isError = action.payload;
     },
   },
+
   extraReducers(builder) {
     builder.addCase(getIssuesData.pending, state => {
       state.isError = false;
@@ -151,26 +134,25 @@ const issueListsSlice = createSlice({
     builder.addCase(getIssuesData.fulfilled, (state, action) => {
       state.isLoading = false;
       state.issuesLists = action.payload;
+      // state.todo = action.payload.todo;
+      // state.inProgress = action.payload.inProgress;
+      // state.done = action.payload.done;
     });
 
     builder.addCase(getIssuesData.rejected, state => {
       state.isLoading = false;
       state.isError = true;
     });
-
-    builder.addCase(getRepoInfo.fulfilled, (state, action) => {
-      if (!action.payload) return;
-      state.repoInfo = action.payload;
-    });
-
-    builder.addCase(getRepoInfo.rejected, state => {
-      state.isLoading = false;
-      state.isError = true;
-    });
   },
 });
 
-export const { updateIssueLists, setIsError, moveIssue, removeIssue } =
-  issueListsSlice.actions;
+export const {
+  getInitialIssueLists,
+  updateIssueLists,
+  moveIssue,
+  removeIssue,
+  setIsLoading,
+  setIsError,
+} = issueListsSlice.actions;
 
 export default issueListsSlice.reducer;
