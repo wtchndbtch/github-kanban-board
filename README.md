@@ -23,7 +23,7 @@ User is able to drag-n-drop between the columns and change the order of issues.
 - UI library:
   - Ant Design
 - State manager
-  - Redux (or Redux-Toolkit)
+  - Redux Toolkit
 - Testing (not yet, but soon):
   - React Testing Library
 - Other:
