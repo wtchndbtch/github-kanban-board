@@ -20,9 +20,9 @@ User is able to drag-n-drop between the columns and change the order of issues.
 
 - React 18 with hooks
 - TypeScript
-- UI library (on your choice):
+- UI library:
   - Ant Design
-- State manager (on your choice):
+- State manager
   - Redux (or Redux-Toolkit)
 - Testing (not yet, but soon):
   - React Testing Library
