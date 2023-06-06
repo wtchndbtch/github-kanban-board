@@ -19,7 +19,7 @@ User is able to drag-n-drop between the columns and change the order of issues.
 ## Technologies
 
 - React 18 with hooks
-- Typescript
+- TypeScript
 - UI library (on your choice):
   - Ant Design
 - State manager (on your choice):
